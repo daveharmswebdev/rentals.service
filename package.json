@@ -1,0 +1,12 @@
+{
+  "name": "rentals-portal",
+  "version": "1.0.0",
+  "description": "## Tech stack + Typescript + Express for write commands + Web socket for read commands + Postgressql + GCP sql instance.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
