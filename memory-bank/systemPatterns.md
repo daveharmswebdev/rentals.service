@@ -1,43 +1,20 @@
-# System Patterns: Rentals Portal
+# System Patterns: Database Management
 
-## System Architecture
-- Microservices-based architecture
-- Separation of concerns between frontend, backend, and database layers
+## Database Configuration
+- Database Type: PostgreSQL 17
+- Connection Strategy: To be determined
+- ORM Consideration: Potential use of TypeORM or Prisma
 
-## Key Technical Decisions
-- Database: PostgreSQL
-- Initial focus on core property management functionality
+## Data Model Patterns
+### Homes Table
+- Primary Key: Auto-incrementing SERIAL
+- Constraint: All fields required
+- Potential future extensions:
+  - Add timestamps (created_at, updated_at)
+  - Add soft delete mechanism
+  - Consider indexing for performance
 
-## Design Patterns
-- Repository pattern for data access
-- Service layer for business logic
-- RESTful API design
-
-## Component Relationships
-1. Database (PostgreSQL)
-   - homes table: Core property information storage
-
-2. Backend Components
-   - Property Management Service
-   - User Authentication Service
-   - Booking Management Service
-
-3. Frontend Components
-   - Property Listing Component
-   - Search and Filter Component
-   - User Profile Management
-
-## Critical Implementation Paths
-- Property CRUD operations
-- User authentication and authorization
-- Search and filtering mechanisms
-
-## Data Flow
-- Client (Frontend) → API Gateway → Backend Services → Database
-- Emphasis on secure, efficient data transmission
-- Caching strategies to be implemented for performance
-
-## Scalability Considerations
-- Stateless backend services
-- Horizontal scaling potential
-- Modular design to support future feature additions
+## Naming Conventions
+- Database: snake_case (`rentals_db`)
+- Tables: plural, snake_case (`homes`)
+- Columns: snake_case
