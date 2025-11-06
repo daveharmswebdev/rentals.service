@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-service
+spec:
+  template:
+    spec:
+      serviceAccountName: gke-deployer  # Important: uses your service account
+      containers:
+      # Your main application container
+      - name: rentals-portal-service
+        image: us-central1-docker.pkg.dev/properties-portal/docker-repo/rentals-portal:latest
+        ports:
+        - containerPort: 3000  # Adjust to your service port
+        env:
+        - name: DB_HOST
+          value: "127.0.0.1"  # Cloud SQL Proxy listens on localhost
+        - name: DB_PORT
+          value: "5432"  # Adjust for MySQL (3306) or PostgreSQL (5432)
+        
+      # Cloud SQL Proxy sidecar
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-docker/cloud-sql-proxy:1.33.2
+        command:
+          - "/cloud_sql_proxy"
+          - "-instances=properties-portal:us-central1:pp-dev=tcp:0.0.0.0:5432"
+          - "-use_http_health_check_server=true"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"

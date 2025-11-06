@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rentals-portal-service
+  namespace: development
+  labels:
+    app: rentals-portal-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rentals-portal-service
+  template:
+    metadata:
+      labels:
+        app: rentals-portal-service
+    spec:
+      serviceAccountName: gke-service-account
+      containers:
+      # Main Application Container
+      - name: rentals-portal-service
+        image: us-central1-docker.pkg.dev/properties-portal/docker-repo/rentals-portal:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: DB_HOST
+          value: "127.0.0.1"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "rentals_db"
+        - name: PGSSLMODE
+          value: "disable"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+
+      # Cloud SQL Proxy Sidecar
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.7.0
+        command:
+          - "/cloud-sql-proxy"
+          - "--port=5432"
+          - "properties-portal:us-central1:pp-dev"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rentals-portal-service
+  namespace: development
+spec:
+  type: LoadBalancer
+  selector: 
+    app: rentals-portal-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
