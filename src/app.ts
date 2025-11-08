@@ -47,13 +47,16 @@ app.use(httpErrorLogger);
 // Graceful shutdown to close database connection
 process.on('SIGINT', async () => {
   logger.info('Received SIGINT signal, shutting down gracefully...');
+  console.log('Received SIGINT signal, shutting down gracefully...');
   await closeDatabaseConnection();
   logger.info('Database connection closed');
+  console.log('Database connection closed');
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM signal, shutting down gracefully...');
+  console.log('Received SIGTERM signal, shutting down gracefully...');
   await closeDatabaseConnection();
   logger.info('Database connection closed');
   process.exit(0);
