@@ -7,6 +7,11 @@ metadata:
     app: rentals-portal-service
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: rentals-portal-service
@@ -20,6 +25,7 @@ spec:
       # Main Application Container
       - name: rentals-portal-service
         image: us-central1-docker.pkg.dev/properties-portal/docker-repo/rentals-portal:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
@@ -48,6 +54,22 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
 
       # Cloud SQL Proxy Sidecar
       - name: cloud-sql-proxy
