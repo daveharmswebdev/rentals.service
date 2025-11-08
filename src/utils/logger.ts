@@ -1,8 +1,11 @@
 import winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
 
+
 const isProduction = process.env.NODE_ENV === 'production';
 const logLevel = process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug');
+
+console.log(`Logger initializing...isProduction:${isProduction}...logLevel:${logLevel}`);
 
 // Define log format for local development (human-readable with colors)
 const localFormat = winston.format.combine(
@@ -73,6 +76,14 @@ const logger = winston.createLogger({
   },
   transports
 });
+
+console.log('Logger created.');
+console.log('NODE_ENV', process.env.NODE_ENV);
+console.log('GCP_PROJECT_ID', process.env.GCP_PROJECT_ID);
+console.log('GCP_KEY_FILE', process.env.GCP_KEY_FILE);
+console.log('GCP_REGION', process.env.GCP_REGION);
+console.log('GKE_CLUSTER_NAME', process.env.GKE_CLUSTER_NAME);
+console.log('K8S_NAMESPACE', process.env.K8S_NAMESPACE);
 
 // Add file transports for local development (optional)
 if (!isProduction) {
