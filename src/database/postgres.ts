@@ -1,5 +1,6 @@
 import { Client, Pool } from 'pg';
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 
 dotenv.config();
 
@@ -32,17 +33,30 @@ const pool = new Pool(dbConfig);
 async function connectToDatabase() {
   try {
     const connectionMode = isUsingProxy ? 'Cloud SQL Proxy' : 'Direct SSL';
-    console.log(`Attempting to connect to PostgreSQL database via ${connectionMode}...`);
-    console.log(`Connection details: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+    logger.info('Attempting to connect to PostgreSQL database', {
+      connectionMode,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER
+    });
     
     await client.connect();
-    console.log('✅ Successfully connected to PostgreSQL database');
+    logger.info('Successfully connected to PostgreSQL database');
     
     // Optional: Run a simple query to verify connection
     const res = await client.query('SELECT NOW()');
-    console.log('🕒 Current database time:', res.rows[0].now);
+    logger.debug('Database connection verified', {
+      currentTime: res.rows[0].now
+    });
   } catch (err) {
-    console.error('❌ Error connecting to the database:', err);
+    logger.error('Error connecting to the database', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      database: process.env.DB_NAME
+    });
     throw err;  // Re-throw to allow caller to handle connection failure
   }
 }
@@ -51,9 +65,13 @@ async function connectToDatabase() {
 async function closeDatabaseConnection() {
   try {
     await client.end();
-    console.log('Database connection closed successfully');
+    await pool.end();
+    logger.info('Database connections closed successfully');
   } catch (err) {
-    console.error('Error closing database connection:', err);
+    logger.error('Error closing database connection', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined
+    });
   }
 }
 
