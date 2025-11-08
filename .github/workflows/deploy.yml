@@ -111,6 +111,10 @@ jobs:
           --namespace=$NAMESPACE \
           --timeout=5m
 
+    # Apply the full deployment manifest to pick up any config changes
+    - name: Apply deployment manifest
+      run: kubectl apply -f deployment.yaml --namespace=$NAMESPACE
+
     # Verify deployment
     - name: Verify deployment
       run: |
