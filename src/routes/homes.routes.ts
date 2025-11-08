@@ -13,6 +13,7 @@ export class HomesRoutes {
 
   private initializeRoutes(): void {
     this.router.get('/', this.homesController.getAllHomes.bind(this.homesController));
+    this.router.get('/:id', this.homesController.getHomeById.bind(this.homesController));
   }
 
   getRouter() {
