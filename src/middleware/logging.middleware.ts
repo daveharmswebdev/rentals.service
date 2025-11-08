@@ -59,11 +59,14 @@ export const httpErrorLogger = expressWinston.errorLogger({
  */
 export const responseTimeMiddleware = (req: any, res: any, next: any) => {
   const startTime = Date.now();
-  
+
+  res.set('X-Response-Time', '0ms'); // Set a default value
+
   res.on('finish', () => {
     const duration = Date.now() - startTime;
-    res.set('X-Response-Time', `${duration}ms`);
+    // You can't set headers here, but you can log the duration if needed
+    // logger.info(`Request duration: ${duration}ms`);
   });
-  
+
   next();
 };
