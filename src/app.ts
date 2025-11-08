@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { client, connectToDatabase, closeDatabaseConnection } from './database/postgres';
 import { HomesRoutes } from './routes/homes.routes';
+import { AddressRoutes } from './routes/address.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,10 @@ app.get('/', (req: Request, res: Response) => {
 // Add homes routes
 const homesRoutes = new HomesRoutes();
 app.use('/api/homes', homesRoutes.getRouter());
+
+// Add address routes
+const addressRoutes = new AddressRoutes();
+app.use('/api/addresses', addressRoutes.getRouter());
 
 // Graceful shutdown to close database connection
 process.on('SIGINT', async () => {
