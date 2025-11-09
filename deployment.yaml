@@ -109,10 +109,43 @@ metadata:
   name: rentals-portal-service
   namespace: development
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector: 
     app: rentals-portal-service
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rentals-portal-ingress
+  namespace: development
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/managed-certificates: "rentals-portal-cert"
+    kubernetes.io/ingress.global-static-ip-name: "rentals-portal-ip"
+spec:
+  rules:
+  - host: api.gatherhubs.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rentals-portal-service
+            port:
+              number: 80
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: rentals-portal-cert
+  namespace: development
+spec:
+  domains:
+    - api.gatherhubs.com
