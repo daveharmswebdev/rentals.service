@@ -61,6 +61,24 @@ spec:
           value: "rentals_db"
         - name: PGSSLMODE
           value: "disable"
+        # Google OAuth Configuration
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth-credentials
+              key: client-id
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth-credentials
+              key: client-secret
+        - name: GOOGLE_CALLBACK_URL
+          value: "https://api.gatherhubs.com/auth/google/callback"
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: session-credentials
+              key: secret
         resources:
           requests:
             cpu: 100m

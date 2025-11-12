@@ -1,13 +1,35 @@
 import express, { Request, Response } from 'express';
+import session from 'express-session';
 import { client, connectToDatabase, closeDatabaseConnection } from './database/postgres';
 import { HomesRoutes } from './routes/homes.routes';
 import { AddressRoutes } from './routes/address.routes';
+import { AuthRoutes } from './routes/auth.routes';
 import { correlationIdMiddleware } from './utils/correlation-id';
 import { httpLogger, httpErrorLogger, responseTimeMiddleware } from './middleware/logging.middleware';
 import logger from './utils/logger';
+import passport from './config/passport.config';
+import { authConfig, validateAuthConfig } from './config/auth.config';
 
 const app = express();
+
+// Trust first proxy (needed for secure cookies behind load balancer or reverse proxy)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 const PORT = process.env.PORT || 3000;
+
+// Validate authentication configuration
+try {
+  validateAuthConfig();
+  logger.info('Authentication configuration validated successfully');
+} catch (error) {
+  logger.error('Authentication configuration validation failed', { error });
+  // In development, we might want to continue without auth
+  // In production, you might want to throw the error
+  if (process.env.NODE_ENV === 'production') {
+    throw error;
+  }
+}
 
 // Connect to database when the app starts
 connectToDatabase();
@@ -24,14 +46,38 @@ app.use(httpLogger);
 // Add middleware to parse JSON
 app.use(express.json());
 
+// Session configuration (must be before passport initialization)
+app.use(
+  session({
+    secret: authConfig.session.secret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // require HTTPS in production
+      httpOnly: true,
+      maxAge: authConfig.session.maxAge,
+      sameSite: 'lax',
+    },
+  })
+);
+
+// Initialize Passport and restore authentication state from session
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Ensure root route works
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({ 
     message: 'Hello, World!',
     status: 'Server is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    authenticated: req.isAuthenticated(),
   });
 });
+
+// Add authentication routes
+const authRoutes = new AuthRoutes();
+app.use('/auth', authRoutes.getRouter());
 
 // Add homes routes
 const homesRoutes = new HomesRoutes();

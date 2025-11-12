@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { HomesController } from '../controllers/homes.controller';
+import { ensureAuthenticated } from '../middleware/auth.middleware';
 
 export class HomesRoutes {
   router: Router;
@@ -12,8 +13,9 @@ export class HomesRoutes {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', this.homesController.getAllHomes.bind(this.homesController));
-    this.router.get('/:id', this.homesController.getHomeById.bind(this.homesController));
+    // Protect all routes with authentication
+    this.router.get('/', ensureAuthenticated, this.homesController.getAllHomes.bind(this.homesController));
+    this.router.get('/:id', ensureAuthenticated, this.homesController.getHomeById.bind(this.homesController));
   }
 
   getRouter() {
