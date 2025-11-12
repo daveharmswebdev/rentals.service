@@ -61,6 +61,22 @@ app.use(
   })
 );
 
+// Log session and cookie details for debugging
+app.use((req, res, next) => {
+  if (req.session) {
+    logger.info('Session middleware active', {
+      sessionID: req.sessionID,
+      session: req.session,
+      cookies: req.cookies,
+      signedCookies: req.signedCookies,
+      headers: req.headers,
+    });
+  } else {
+    logger.warn('No session found on request');
+  }
+  next();
+});
+
 // Initialize Passport and restore authentication state from session
 app.use(passport.initialize());
 app.use(passport.session());
