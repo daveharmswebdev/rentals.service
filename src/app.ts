@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { createClient } from 'redis';
 import { RedisStore } from 'connect-redis';
 import session from 'express-session';
+import swaggerUi from 'swagger-ui-express';
 import { client, connectToDatabase, closeDatabaseConnection } from './database/postgres';
 import { HomesRoutes } from './routes/homes.routes';
 import { AddressRoutes } from './routes/address.routes';
@@ -11,6 +12,7 @@ import { httpLogger, httpErrorLogger, responseTimeMiddleware } from './middlewar
 import logger from './utils/logger';
 import passport from './config/passport.config';
 import { authConfig, validateAuthConfig } from './config/auth.config';
+import { swaggerSpec } from './config/swagger.config';
 
 const app = express();
 
@@ -104,6 +106,12 @@ app.get('/', (req: Request, res: Response) => {
     authenticated: req.isAuthenticated(),
   });
 });
+
+// Swagger documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Rentals Portal API Documentation',
+}));
 
 // Add authentication routes
 const authRoutes = new AuthRoutes();

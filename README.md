@@ -21,6 +21,21 @@ RESTful API for managing rental properties and addresses, secured with Google OA
 - ✅ Docker containerization
 - ✅ Kubernetes deployment
 - ✅ HTTPS with managed certificates
+- ✅ **Interactive API documentation (Swagger/OpenAPI)**
+
+## API Documentation
+
+Interactive API documentation is available via Swagger UI:
+
+**Local Development**: `http://localhost:3000/api-docs`  
+**Production**: `https://your-domain.com/api-docs`
+
+The Swagger UI provides:
+- Complete API endpoint documentation
+- Request/response schemas
+- Try-it-out functionality
+- Authentication information
+- Example requests and responses
 
 ## API Endpoints
 
