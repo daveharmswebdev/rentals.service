@@ -1,4 +1,6 @@
 import express, { Request, Response } from 'express';
+import { createClient } from 'redis';
+import { RedisStore } from 'connect-redis';
 import session from 'express-session';
 import { client, connectToDatabase, closeDatabaseConnection } from './database/postgres';
 import { HomesRoutes } from './routes/homes.routes';
@@ -47,15 +49,27 @@ app.use(httpLogger);
 app.use(express.json());
 
 // Session configuration (must be before passport initialization)
+
+// Redis session store setup
+const redisClient = createClient({
+  socket: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: Number(process.env.REDIS_PORT) || 6379,
+  },
+});
+
+redisClient.connect().catch(console.error);
+
 app.use(
   session({
-    secret: authConfig.session.secret,
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET || 'your-secret-key-here-change-in-production',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // require HTTPS in production
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: authConfig.session.maxAge,
+      maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'lax',
     },
   })
