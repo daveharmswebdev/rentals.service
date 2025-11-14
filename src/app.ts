@@ -1,9 +1,8 @@
 import express, { Request, Response } from 'express';
-import { createClient } from 'redis';
-import { RedisStore } from 'connect-redis';
 import session from 'express-session';
+import pgSession from 'connect-pg-simple';
 import swaggerUi from 'swagger-ui-express';
-import { client, connectToDatabase, closeDatabaseConnection } from './database/postgres';
+import { client, connectToDatabase, closeDatabaseConnection, getPostgresPool } from './database/postgres';
 import { HomesRoutes } from './routes/homes.routes';
 import { AddressRoutes } from './routes/address.routes';
 import { AuthRoutes } from './routes/auth.routes';
@@ -53,19 +52,17 @@ app.use(express.json());
 
 // Session configuration (must be before passport initialization)
 
-// Redis session store setup
-const redisClient = createClient({
-  socket: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: Number(process.env.REDIS_PORT) || 6379,
-  },
-});
-
-redisClient.connect().catch(console.error);
+// PostgreSQL session store setup
+const PgStore = pgSession(session);
 
 app.use(
   session({
-    store: new RedisStore({ client: redisClient }),
+    store: new PgStore({
+      pool: getPostgresPool(),
+      tableName: 'session',
+      createTableIfMissing: true, // Auto-create session table if it doesn't exist
+      pruneSessionInterval: 60 * 15, // Cleanup expired sessions every 15 minutes
+    }),
     secret: process.env.SESSION_SECRET || 'your-secret-key-here-change-in-production',
     resave: false,
     saveUninitialized: false,

@@ -79,11 +79,6 @@ spec:
             secretKeyRef:
               name: session-credentials
               key: secret
-        # Redis Configuration for Session Store
-        - name: REDIS_HOST
-          value: "10.45.176.139"
-        - name: REDIS_PORT
-          value: "6379"
         resources:
           requests:
             cpu: 100m
