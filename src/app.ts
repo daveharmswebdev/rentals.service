@@ -7,6 +7,7 @@ import { client, connectToDatabase, closeDatabaseConnection } from './database/p
 import { HomesRoutes } from './routes/homes.routes';
 import { AddressRoutes } from './routes/address.routes';
 import { AuthRoutes } from './routes/auth.routes';
+import { ReceiptsRoutes } from './routes/receipts.routes';
 import { correlationIdMiddleware } from './utils/correlation-id';
 import { httpLogger, httpErrorLogger, responseTimeMiddleware } from './middleware/logging.middleware';
 import logger from './utils/logger';
@@ -124,6 +125,10 @@ app.use('/api/homes', homesRoutes.getRouter());
 // Add address routes
 const addressRoutes = new AddressRoutes();
 app.use('/api/addresses', addressRoutes.getRouter());
+
+// Add receipts routes
+const receiptsRoutes = new ReceiptsRoutes();
+app.use('/api/receipts', receiptsRoutes.getRouter());
 
 // Add HTTP error logging (must be after routes)
 app.use(httpErrorLogger);

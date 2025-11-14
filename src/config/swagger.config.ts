@@ -115,6 +115,82 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
+        Receipt: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer',
+              description: 'Unique identifier for the receipt',
+              example: 1,
+            },
+            home_id: {
+              type: 'integer',
+              description: 'ID of the home this receipt belongs to',
+              example: 1,
+            },
+            total: {
+              type: 'number',
+              format: 'float',
+              description: 'Total amount on the receipt',
+              example: 350.00,
+            },
+            type: {
+              type: 'string',
+              enum: ['service', 'store'],
+              description: 'Type of receipt: service for services, store for goods',
+              example: 'service',
+            },
+            vendor_name: {
+              type: 'string',
+              description: 'Name of the vendor or service provider',
+              example: 'ABC HVAC Services',
+            },
+            paid_date: {
+              type: 'string',
+              format: 'date',
+              description: 'Date the receipt was paid',
+              example: '2025-01-15',
+            },
+            description: {
+              type: 'string',
+              description: 'Optional description of the purchase or service',
+              example: 'Annual AC maintenance and filter replacement',
+            },
+            category: {
+              type: 'string',
+              description: 'Optional category for organizing receipts',
+              example: 'HVAC',
+            },
+            receipt_url: {
+              type: 'string',
+              format: 'uri',
+              description: 'Optional URL to digital receipt image or PDF',
+              example: 'https://example.com/receipts/123.pdf',
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Timestamp when the receipt was created',
+              example: '2025-01-15T10:30:00Z',
+            },
+            updated_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Timestamp when the receipt was last updated',
+              example: '2025-01-15T10:30:00Z',
+            },
+            created_by: {
+              type: 'string',
+              description: 'User who created the receipt',
+              example: 'admin@example.com',
+            },
+            updated_by: {
+              type: 'string',
+              description: 'User who last updated the receipt',
+              example: 'admin@example.com',
+            },
+          },
+        },
         Error: {
           type: 'object',
           properties: {

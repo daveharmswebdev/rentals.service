@@ -178,6 +178,64 @@ src/
 - Test files: `*.spec.ts` or `*.test.ts`
 - Example: `src/services/homes.service.spec.ts`
 
+## Database Migrations
+
+All database schema changes must be implemented using paired migration scripts:
+
+**Migration File Naming Convention**:
+```
+sql/
+├── <description>_up.sql      # Forward migration (apply changes)
+└── <description>_down.sql    # Rollback migration (undo changes)
+```
+
+**Example**:
+```
+sql/
+├── add_receipts_table_up.sql
+└── add_receipts_table_down.sql
+```
+
+**Migration Script Requirements**:
+
+1. **Up Migrations** (`*_up.sql`):
+   - Add tables, columns, indexes, constraints
+   - Include sample/test data if appropriate
+   - Use `IF NOT EXISTS` checks where applicable
+   - Add comments documenting the purpose
+   - Include table/column comments for documentation
+
+2. **Down Migrations** (`*_down.sql`):
+   - Reverse all changes made in the up migration
+   - Drop tables, columns, indexes, constraints in reverse order
+   - Handle dependencies (drop dependent objects first)
+   - Use `IF EXISTS` checks to prevent errors
+   - Must be idempotent (safe to run multiple times)
+
+**Migration Execution**:
+```bash
+# Apply migration (up)
+psql -h <host> -U postgres -d rentals_db -f sql/<description>_up.sql
+
+# Rollback migration (down)
+psql -h <host> -U postgres -d rentals_db -f sql/<description>_down.sql
+```
+
+**Best Practices**:
+- Always create both up and down scripts together
+- Test both directions (up → down → up) before committing
+- Never modify existing migration files after they've been applied to production
+- Create new migration files for schema changes
+- Document breaking changes or data loss risks in migration comments
+- Consider data migration implications (not just schema)
+
+**When Adding New Entities**:
+1. Create paired migration scripts (`<entity>_up.sql` and `<entity>_down.sql`)
+2. Include CREATE TABLE statements with all constraints
+3. Add indexes for foreign keys and frequently queried columns
+4. Include sample data for development/testing
+5. Test rollback to ensure clean removal
+
 ## Known Production Setup
 
 - **GCP Project**: `properties-portal`

@@ -18,6 +18,10 @@
       "/node_modules/",
       "/dist/"
     ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -35,7 +39,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/connect-redis": "^0.0.23",
     "@types/express": "^5.0.5",
     "@types/express-session": "^1.18.2",
     "@types/express-winston": "^3.0.4",
